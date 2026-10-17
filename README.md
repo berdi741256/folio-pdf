@@ -13,6 +13,14 @@ Lector y editor de PDF que funciona **sin conexión**. Se instala como app en An
 
 Todo se procesa en el dispositivo; ningún archivo se envía a internet.
 
+## App Android (APK)
+Descarga: **https://github.com/berdi741256/folio-pdf/releases/latest/download/FolioPDF.apk**
+
+- Aparece en **Abrir con** para cualquier PDF y puede ser el lector predeterminado.
+- Funciona sin internet desde el primer uso.
+- Se compila sola con GitHub Actions (`.github/workflows/apk.yml`) en cada cambio a `main`; cada versión queda en *Releases*.
+- La clave de firma (`android/folio-release.p12`) debe mantenerse igual para que las actualizaciones se instalen encima de la versión anterior.
+
 ## Publicar en GitHub Pages
 1. Crea un repositorio (por ejemplo `folio-pdf`) y sube todo el contenido de esta carpeta a la raíz.
 2. En el repositorio: **Settings → Pages → Source: Deploy from a branch → main / (root) → Save**.

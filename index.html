@@ -197,6 +197,8 @@ const pdfjs = window.pdfjsLib;
 pdfjs.GlobalWorkerOptions.workerSrc = "lib/pdf.worker.min.js";
 const { PDFDocument, rgb, degrees, StandardFonts } = PDFLib;
 const NS = "http://www.w3.org/2000/svg";
+const ANDROID = !!window.FolioAndroid;
+let readyResolve; const ready = new Promise(r=>readyResolve=r);
 
 /* ---------- state ---------- */
 const TOOLS = {
@@ -607,6 +609,12 @@ $("save").onclick = async ()=>{
   catch(err){ toast("No se pudo guardar el archivo."); }
 };
 async function saveBlob(blob, fname){
+  if(ANDROID){
+    const b64 = await new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(String(fr.result).split(",")[1]); fr.onerror=rej; fr.readAsDataURL(blob); });
+    const status = await new Promise(res=>{ window.folioSaved = res; window.FolioAndroid.save(b64, fname); });
+    if(status==="error") throw new Error("save");
+    return status==="saved";
+  }
   const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
   if(window.showSaveFilePicker){
     try{
@@ -634,7 +642,7 @@ let installEvt=null;
 addEventListener("beforeinstallprompt", e=>{ e.preventDefault(); installEvt=e; $("install").hidden=false; });
 $("install").onclick = async ()=>{ if(!installEvt) return; installEvt.prompt(); await installEvt.userChoice; installEvt=null; $("install").hidden=true; };
 addEventListener("appinstalled", ()=>{ $("install").hidden=true; toast("Folio PDF quedó instalada"); });
-if("serviceWorker" in navigator && location.protocol!=="file:"){
+if(!ANDROID && "serviceWorker" in navigator && location.protocol!=="file:"){
   navigator.serviceWorker.register("sw.js").catch(()=>{});
 }
 if("launchQueue" in window){
@@ -651,6 +659,25 @@ async function checkShared(){
     await openFile(new File([blob], name, {type:"application/pdf"}), true); return true;
   }catch(_){ return false; }
 }
+
+/* ---------- Android app bridge ---------- */
+window.folioIncoming = async ()=>{
+  if(!ANDROID) return;
+  await ready;
+  const j = window.FolioAndroid.takeIncoming(); if(!j) return;
+  try{
+    const {url,name} = JSON.parse(j);
+    const r = await fetch(url); if(!r.ok) throw new Error();
+    const b = await r.blob();
+    await openFile(new File([b], name, {type:"application/pdf"}), true);
+  }catch(_){ toast("No se pudo abrir el archivo recibido."); }
+};
+window.folioBack = ()=>{
+  if(openTA){ openTA.blur(); return true; }
+  if(!$("sheet").hidden){ closeSheet(); return true; }
+  if(S.tool!=="view"){ setTool("view"); return true; }
+  return false;
+};
 
 /* ---------- sample document ---------- */
 async function makeSample(){
@@ -681,8 +708,8 @@ async function init(){
     p.annots.push({id:nid(), t:"text", x:88, y:600, text:"Anotación de prueba", c:"#c62f3a", fs:14});
     p.annots.push({id:nid(), t:"ink", c:"#c62f3a", s:2.5, pts:[[60,606],[66,614],[78,596]]});
     lastW=$("desk").clientWidth; renderAll(); setTool("view");
-    checkShared();
-  }catch(err){ toast("No se pudo iniciar el visor."); }
+    readyResolve(); checkShared(); window.folioIncoming();
+  }catch(err){ readyResolve(); toast("No se pudo iniciar el visor."); }
 }
 init();
 })();

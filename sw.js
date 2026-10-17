@@ -1,5 +1,5 @@
 // Folio PDF — service worker: guarda la app para usarla sin conexión.
-const VERSION = "folio-v2";
+const VERSION = "folio-v3";
 const ARCHIVOS = [
   "./", "index.html", "manifest.webmanifest",
   "lib/pdf.min.js", "lib/pdf.worker.min.js", "lib/pdf-lib.min.js",
