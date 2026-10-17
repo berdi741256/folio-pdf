@@ -8,6 +8,7 @@ Lector y editor de PDF que funciona **sin conexión**. Se instala como app en An
 - Mover y borrar anotaciones, deshacer y rehacer.
 - Organizar páginas: girar, reordenar, duplicar, eliminar, agregar páginas en blanco y unir varios PDF.
 - Guardar una copia nueva (`nombre-editado.pdf`). El original no se modifica.
+- En Windows, Mac y Chromebook: se registra como app para abrir PDF y puede ser el lector predeterminado.
 - En Android, abrir un PDF desde **Compartir → Folio PDF**.
 
 Todo se procesa en el dispositivo; ningún archivo se envía a internet.

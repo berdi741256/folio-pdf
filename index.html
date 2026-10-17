@@ -638,7 +638,7 @@ if("serviceWorker" in navigator && location.protocol!=="file:"){
   navigator.serviceWorker.register("sw.js").catch(()=>{});
 }
 if("launchQueue" in window){
-  launchQueue.setConsumer(async params=>{ if(params.files && params.files.length){ const f = await params.files[0].getFile(); openFile(f, true); } });
+  launchQueue.setConsumer(async params=>{ if(!params.files || !params.files.length) return; const fs=[]; for(const h of params.files){ try{ fs.push(await h.getFile()); }catch(_){} } if(!fs.length) return; await openFile(fs[0], true); for(const f of fs.slice(1)) await openFile(f, false); });
 }
 async function checkShared(){
   if(!/[?&]compartido/.test(location.search) || !("caches" in window)) return false;
