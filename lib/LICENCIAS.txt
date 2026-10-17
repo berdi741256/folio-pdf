@@ -1,0 +1,3 @@
+pdf.js 3.11.174 — Apache License 2.0 — https://github.com/mozilla/pdf.js
+pdf-lib 1.17.1 — MIT License — https://github.com/Hopding/pdf-lib
+Instrument Sans, JetBrains Mono — SIL Open Font License 1.1
